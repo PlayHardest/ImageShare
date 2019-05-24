@@ -1,25 +1,214 @@
 <head>
-  <title>ImageShare</title>
+  <title>Album</title>
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
-
-  {{> hello}}
-  {{> info}}
+  <div class="container">
+    {{> addModal}}
+    {{> navBar}}
+    {{> mainBody}}
+    {{> footerBar}}
+  </div>
 </body>
 
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+<template name="navBar">
+  <header>
+    <div class="collapse bg-dark" id="navbarHeader">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-8 col-md-7 py-4">
+            <h4 class="text-white">About</h4>
+            <p class="text-muted">ImageShare is your go to place for book reviews and ratings of new and upcoming books as well as the classics.</p>
+          </div>
+          <div class="col-sm-4 offset-md-1 py-4">
+            <h4 class="text-white">You can...</h4>
+            <ul class="list-unstyled">
+              <li><a href="#" class="text-white">Follow on Twitter</a></li>
+              <li><a href="#" class="text-white">Like on Facebook</a></li>
+              <li><a href="#" class="text-white">Email us</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+      <div class="container d-flex justify-content-between">
+        <a href="#" class="navbar-brand d-flex align-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2" viewBox="0 0 24 24" focusable="false"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          <strong>Album</strong>
+        </a>
+        {{>loginButtons}}
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </div>
+  </header>
 </template>
 
-<template name="info">
-  <h2>Learn Meteor!</h2>
-  <ul>
-    <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
-    <li><a href="http://guide.meteor.com" target="_blank">Follow the Guide</a></li>
-    <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
-    <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
-  </ul>
+<template name="myJumbo">
+  <section class="jumbotron text-center">
+    <div class="container">
+      <h1 class="jumbotron-heading">ImageShare</h1>
+      <p class="lead text-muted">Glad you found your way here. It's always a good time to read a book. Find your passion amongst the stars by choosing from our many categories tailored just for you.</p>
+      {{#if currentUser}}
+        <button type="button" class="btn btn-primary addnewimage">Add new image</button>
+      {{/if}}
+      
+      <button type="button" class="btn btn-primary js-searchEnd">Clear filter</button>
+
+      
+    </div>
+  </section>
 </template>
+
+<template name="mainBody">
+  <main role="main">
+    {{> myJumbo}}
+    <div class="album py-5 bg-light">
+      <div class="container">
+        <div class="row">
+          {{#each imageAll}}
+
+          <div id={{_id}} class="col-md-4 align">
+            <img class ="image rounded" src={{image}} alt="temp photo">
+            <!-- <div class="as"> -->
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="overlay btn-group">
+                <button type="button" class="btn btn-sm btn-light"><i class="zmdi zmdi-view-array"></i></button>
+                {{#if userCheck}}
+                  <button type="button" class="btn btn-sm btn-light js-edit"><i class="zmdi zmdi-edit"></i></button>
+                  <button type="button" class="btn btn-sm btn-light js-delete"><i class="zmdi zmdi-delete"></i></button>
+                {{/if}}
+              </div>
+            </div>
+
+            <div class="col-8 offset-1">
+              {{> starsRating id='rating' rating=Rating data_id=_id class='js-rate' mutable=true}}
+              Posted by <a href = "" class = "js-userShow">{{userName}} </a>
+            </div>
+            <!-- </div> -->
+            
+            <!-- <div class="card mb-4 shadow-sm">
+              <img class ="image rounded" src={{image}} alt="temp photo">
+              <div class="card-body">
+                <p class="card-text"><h3>{{Title}}</h3>{{> starsRating id='rating' rating=Rating data_id=_id class='js-rate' mutable=true}}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="zmdi zmdi-view-array"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary js-edit"><i class="zmdi zmdi-edit"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary js-delete"><i class="zmdi zmdi-delete"></i></button>
+                  </div>
+                   <small class="text-muted">Created on {{createdOn}}</small> 
+                </div>
+              </div>
+            </div>
+          </div>  -->
+          </div>
+          <div class="modal fade" id="editimage{{_id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Edit an Image's details</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <form>
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Title :</span>
+                      </div>
+                      <input type="text" name="etitlePath" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Image :</span>
+                      </div>
+                      <input type="text" name="eimagePath" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                    </div>
+
+                    <div class="form-group">
+                      <!-- <label for="description" class="col-form-label">Description :</label> -->
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Description :</span>
+                      </div>
+                      <textarea class="form-control" name="edescriptionPath"></textarea>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary js-saveimg">Save Changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div> <!-- /row for all cards -->
+      </div>
+    </div>
+  </main>
+</template>
+
+<template name="addModal">
+  <div class="modal fade" id="addimage" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add an image to the gallery</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">Title :</span>
+              </div>
+              <input type="text" id="titlePath" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+            </div>
+
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">Image :</span>
+              </div>
+              <input type="text" id="imagePath" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+            </div>
+
+            <div class="form-group">
+              <!-- <label for="description" class="col-form-label">Description :</label> -->
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">Description :</span>
+              </div>
+              <textarea class="form-control" id="descriptionPath"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary addimage">Add Image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+
+<template name="footerBar">
+  <footer class="text-muted">
+    <div class="container">
+      <p class="text-center">{{imagecount}} Images found</p>    
+    </div>
+  </footer>
+</template>
+
+<!-- <script>
+  function EnterMouseFunction(){
+    MouseOver = this._id;
+    console.log("-",MouseOver);
+  }
+</script> -->
